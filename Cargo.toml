@@ -8,5 +8,3 @@ description = "Shared types, JSONL IPC, and utilities for Apiari tools"
 [dependencies]
 serde.workspace = true
 serde_json.workspace = true
-chrono.workspace = true
-uuid.workspace = true
