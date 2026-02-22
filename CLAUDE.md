@@ -9,6 +9,13 @@ cargo test -p apiari-common    # Run tests (25 unit + 2 doctests)
 cargo doc -p apiari-common     # Generate docs
 ```
 
+## Git Workflow
+
+- You are working in a swarm worktree on a `swarm/*` branch. Stay on this branch.
+- NEVER push to or merge into `main` directly.
+- When done, create a PR from your branch. Swarm will handle merging.
+- NEVER run `git push origin main` or `git checkout main`.
+
 ## Architecture
 
 ```
