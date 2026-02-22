@@ -4,8 +4,8 @@
 //! The reader tracks a byte offset so that each call to [`JsonlReader::poll`]
 //! only returns newly appended records since the last read.
 
-use serde::de::DeserializeOwned;
 use serde::Serialize;
+use serde::de::DeserializeOwned;
 use std::fs::{self, OpenOptions};
 use std::io::{self, BufRead, BufReader, Seek, SeekFrom, Write};
 use std::marker::PhantomData;

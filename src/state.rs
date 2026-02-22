@@ -5,8 +5,8 @@
 //! (write to a temp file, then rename) so a crash mid-write never corrupts the
 //! on-disk state.
 
-use serde::de::DeserializeOwned;
 use serde::Serialize;
+use serde::de::DeserializeOwned;
 use std::io;
 use std::path::Path;
 
