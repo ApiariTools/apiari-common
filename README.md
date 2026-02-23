@@ -1,23 +1,15 @@
 # apiari-common
 
-Shared library for the [Apiari](https://github.com/ApiariTools) toolchain. Provides types and utilities used by swarm, buzz, hive, and keeper.
+Minimal shared library for the [Apiari](https://github.com/ApiariTools) toolchain. Used by `swarm` (TUI agent multiplexer) and `hive` (orchestration daemon) to share IPC and state persistence primitives.
 
 ## Modules
 
-### `shell`
+### `ipc` — JSONL read/write with cursor-based polling
 
-Shell quoting and sanitization.
+Generic reader and writer for line-delimited JSON files.
 
-```rust
-use apiari_common::shell::{shell_quote, sanitize};
-
-assert_eq!(shell_quote("it's fine"), "'it'\\''s fine'");
-assert_eq!(sanitize("Fix the BUG!"), "fix-the-bug");
-```
-
-### `ipc`
-
-Generic JSONL reader/writer with cursor-based polling. Tracks byte offsets for incremental reads.
+- **`JsonlReader<T>`** — Tracks a byte offset so each call to `poll()` returns only newly appended records. Supports `skip_to_end()` and `with_offset()` for resuming from persisted cursors. Malformed lines are silently skipped.
+- **`JsonlWriter<T>`** — Appends serialized records as JSON lines. Creates parent directories and the file automatically.
 
 ```rust
 use apiari_common::ipc::{JsonlWriter, JsonlReader};
@@ -29,34 +21,31 @@ let mut reader = JsonlReader::<MyMessage>::new(".swarm/inbox.jsonl");
 let new_messages = reader.poll()?;
 ```
 
-### `signal`
+### `state` — Atomic JSON state persistence
 
-The shared `Signal` type that buzz produces and hive/keeper consume.
+Two functions for loading and saving arbitrary state to JSON files:
 
-```rust
-use apiari_common::signal::{Signal, Severity};
-
-let signal = Signal::new("sentry", Severity::Critical, "OOM in prod", "Worker killed")
-    .with_url("https://sentry.io/issues/123")
-    .with_tags(vec!["production".into()]);
-```
-
-### `state`
-
-Atomic JSON state persistence (write to temp file, then rename).
+- **`load_state<T>(path)`** — Reads and deserializes a JSON file. Returns `T::default()` if the file doesn't exist.
+- **`save_state<T>(path, state)`** — Writes atomically (write to `.tmp`, then rename) so a crash mid-write never corrupts the on-disk file. Creates parent directories automatically.
 
 ```rust
 use apiari_common::state::{load_state, save_state};
 
-let state: MyState = load_state("state.json")?; // returns Default if missing
-save_state("state.json", &state)?;              // atomic write
+let state: MyState = load_state(path)?; // returns Default if missing
+save_state(path, &state)?;              // atomic write
 ```
 
-## Usage
+## Dependencies
 
-Add to your `Cargo.toml`:
+Intentionally minimal — only `serde` and `serde_json`. This keeps compile times low and avoids pulling transitive dependencies into downstream crates.
+
+## Usage
 
 ```toml
 [dependencies]
 apiari-common.workspace = true
 ```
+
+## License
+
+MIT
