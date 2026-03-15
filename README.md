@@ -1,6 +1,13 @@
 # apiari-common
 
-Minimal shared library for the [Apiari](https://github.com/ApiariTools) toolchain. Used by `swarm` (TUI agent multiplexer) and `hive` (orchestration daemon) to share IPC and state persistence primitives.
+Crash-safe IPC and state primitives for the [Apiari](https://github.com/ApiariTools) toolchain — so every consumer gets the same battle-tested file I/O without reinventing it.
+
+## Install
+
+```toml
+[dependencies]
+apiari-common = "0.1"
+```
 
 ## Modules
 
@@ -35,17 +42,19 @@ let state: MyState = load_state(path)?; // returns Default if missing
 save_state(path, &state)?;              // atomic write
 ```
 
-## Dependencies
+## Design philosophy
 
-Intentionally minimal — only `serde` and `serde_json`. This keeps compile times low and avoids pulling transitive dependencies into downstream crates.
+`apiari-common` exists so that every tool in the Apiari ecosystem reads and writes files the same way — same JSONL format, same atomic-rename dance, same cursor semantics. Extracting these into a shared crate means bug fixes land once and propagate everywhere.
 
-## Usage
+The dependency footprint is intentionally minimal: only `serde` and `serde_json`. No async runtime, no logging framework, no feature flags. This keeps compile times low, avoids transitive dependency surprises, and makes the crate trivial to audit. If a primitive doesn't need to be shared, it doesn't belong here.
 
-```toml
-[dependencies]
-apiari-common.workspace = true
-```
+## Ecosystem
+
+`apiari-common` is used by:
+
+- [**apiari**](https://github.com/ApiariTools/apiari) — CLI agent orchestrator
+- [**swarm**](https://github.com/ApiariTools/swarm) — TUI agent multiplexer
 
 ## License
 
-MIT
+[MIT](LICENSE)
