@@ -15,7 +15,7 @@ cargo doc -p apiari-common     # Generate docs
 2. **Only modify files within this repo (`common/`).** Do not touch other repos in the workspace (e.g., `hive/`, `claude-sdk/`, `swarm/`).
 3. **When done, create a PR:**
    ```bash
-   gh pr create --repo ApiariTools/apiari-common --title "..." --body "..."
+   gh pr create --repo ApiariTools/apiari-common --reviewer @copilot --title "..." --body "..."
    ```
 4. **Do not run `cargo install` or modify system state.** No global installs, no modifying dotfiles, no system-level changes.
 
