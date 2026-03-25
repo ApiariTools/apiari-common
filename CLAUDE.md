@@ -1,64 +1,31 @@
-# apiari-common
+# Worker Profile
 
-Minimal shared library crate for the Apiari toolchain.
+## Rules
+1. You are working in a git worktree on a `swarm/*` branch. Never commit to main.
+2. Only modify files within this repository.
+3. When done, create a PR with `gh pr create --reviewer @copilot`.
+4. Do not run `cargo install` or modify system state.
+5. Plan and execute in one go — do not pause for confirmation.
 
-## Quick Reference
+## Scope Discipline
+- ONLY make changes described in the task. Do not refactor, reorganize, or improve unrelated code.
+- If `.task/TASK.md` has an **Anti-Goals** section, treat every item as a hard constraint — do NOT do those things.
+- If `.task/PLAN.md` exists, follow its steps exactly. Do not add extra steps.
+- Do not modify files outside the plan unless strictly required to complete a planned step.
+- A focused PR that does one thing well is better than a large PR that "also fixes" other things.
+- When in doubt about whether something is in scope, it isn't. Leave it alone.
 
-```bash
-cargo test -p apiari-common    # Run tests (11 unit tests)
-cargo doc -p apiari-common     # Generate docs
-```
+## Task Artifacts
+If a `.task/` directory exists, read ALL files before writing any code:
+- `.task/TASK.md` — Task definition with scope, acceptance criteria, and anti-goals
+- `.task/CONTEXT.md` — Relevant codebase files and patterns
+- `.task/PLAN.md` — Step-by-step implementation plan (follow exactly)
+- `.task/PROGRESS.md` — Update this as you complete each step
 
-## Swarm Worker Rules
-
-1. **You are working in a git worktree.** Always create a new branch (`swarm/*`), never commit directly to `main`.
-2. **Only modify files within this repo (`common/`).** Do not touch other repos in the workspace (e.g., `hive/`, `claude-sdk/`, `swarm/`).
-3. **When done, create a PR:**
-   ```bash
-   gh pr create --repo ApiariTools/apiari-common --title "..." --body "..."
-   ```
-4. **Do not run `cargo install` or modify system state.** No global installs, no modifying dotfiles, no system-level changes.
+**Do NOT commit `.task/` to git.** These are pipeline artifacts, not source code.
 
 ## Git Workflow
-
-- You are working in a swarm worktree on a `swarm/*` branch. Stay on this branch.
-- NEVER push to or merge into `main` directly.
-- NEVER run `git push origin main` or `git checkout main`.
-- When done, push your branch and open a PR. Swarm will handle merging.
-
-## Architecture
-
-```
-src/
-  lib.rs       # Module declarations
-  ipc.rs       # JsonlReader<T> / JsonlWriter<T> with byte-offset cursor
-  state.rs     # load_state<T>(), save_state<T>() with atomic writes
-```
-
-## Design Rules
-
-- **No heavy dependencies.** This crate uses `std::io::Result` (not color-eyre). Only deps are serde + serde_json.
-- **Only shared types belong here.** If a type is only used by one crate, it stays in that crate. A type moves here when 2+ crates need it.
-- **Generic over `T`.** `JsonlReader<T>` and `JsonlWriter<T>` are generic over any `Serialize + DeserializeOwned` type. `load_state` and `save_state` are similarly generic.
-- **Atomic writes.** `save_state` writes to a `.tmp` file then renames. This prevents partial/corrupt reads.
-- **Cursor-based polling.** `JsonlReader` tracks a byte offset. `poll()` reads only new lines since the last call. `skip_to_end()` jumps to EOF without reading.
-
-## What moved out
-
-- `signal.rs` (Signal, Severity) -> `hive::signal` (only hive uses it now)
-- `shell.rs` (shell_quote, sanitize) -> `swarm::core::shell` (only swarm uses it)
-
-## Integration Map
-
-| Crate | Uses |
-|-------|------|
-| swarm | `ipc::JsonlReader`, `ipc::JsonlWriter`, `state::load_state`, `state::save_state` |
-| hive | `ipc::JsonlReader`, `ipc::JsonlWriter`, `state::load_state`, `state::save_state` |
-| claude-sdk | Does not use common |
-
-## Key Types
-
-- `JsonlReader<T>`: new(), with_offset(), offset(), set_offset(), poll(), skip_to_end()
-- `JsonlWriter<T>`: new(), path(), append()
-- `load_state<T>(path)`: Load JSON, returns T::default() if missing
-- `save_state<T>(path, &T)`: Atomic write via tmp + rename
+- Stay on your `swarm/*` branch
+- NEVER push to or merge into `main`
+- Commit early and often
+- Push your branch and open a PR when done
