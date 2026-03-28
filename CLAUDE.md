@@ -2,29 +2,17 @@
 
 Minimal shared library crate for the Apiari toolchain.
 
+## Rules
+1. You are working in a Git worktree on a `swarm/*` branch. Never commit to `main`.
+2. Only modify files within this repository.
+3. Do not run `cargo install` or modify system state.
+
 ## Quick Reference
 
 ```bash
 cargo test -p apiari-common    # Run tests (11 unit tests)
 cargo doc -p apiari-common     # Generate docs
 ```
-
-## Swarm Worker Rules
-
-1. **You are working in a git worktree.** Always create a new branch (`swarm/*`), never commit directly to `main`.
-2. **Only modify files within this repo (`common/`).** Do not touch other repos in the workspace (e.g., `hive/`, `claude-sdk/`, `swarm/`).
-3. **When done, create a PR:**
-   ```bash
-   gh pr create --repo ApiariTools/apiari-common --reviewer @copilot --title "..." --body "..."
-   ```
-4. **Do not run `cargo install` or modify system state.** No global installs, no modifying dotfiles, no system-level changes.
-
-## Git Workflow
-
-- You are working in a swarm worktree on a `swarm/*` branch. Stay on this branch.
-- NEVER push to or merge into `main` directly.
-- NEVER run `git push origin main` or `git checkout main`.
-- When done, push your branch and open a PR. Swarm will handle merging.
 
 ## Architecture
 
@@ -45,7 +33,7 @@ src/
 
 ## What moved out
 
-- `signal.rs` (Signal, Severity) -> `hive::signal` (only hive uses it now)
+- `signal.rs` (Signal, Severity) -> `apiari::buzz::signal` (only apiari uses it now)
 - `shell.rs` (shell_quote, sanitize) -> `swarm::core::shell` (only swarm uses it)
 
 ## Integration Map
@@ -53,8 +41,7 @@ src/
 | Crate | Uses |
 |-------|------|
 | swarm | `ipc::JsonlReader`, `ipc::JsonlWriter`, `state::load_state`, `state::save_state` |
-| hive | `ipc::JsonlReader`, `ipc::JsonlWriter`, `state::load_state`, `state::save_state` |
-| claude-sdk | Does not use common |
+| apiari | `ipc::JsonlReader`, `ipc::JsonlWriter`, `state::load_state`, `state::save_state` |
 
 ## Key Types
 
