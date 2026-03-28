@@ -2,6 +2,9 @@
 
 Minimal shared library crate for the Apiari toolchain.
 
+## Git Hooks
+Run `git config core.hooksPath .githooks` to activate pre-commit checks (fmt + clippy).
+
 ## Rules
 1. You are working in a Git worktree on a `swarm/*` branch. Never commit to `main`.
 2. Only modify files within this repository.
